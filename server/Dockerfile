@@ -20,7 +20,7 @@ RUN dotnet restore src/FieldOps.Api/FieldOps.Api.csproj
 
 COPY src/ .
 COPY FieldOps.sln .
-RUN dotnet publish FieldOps.sln -c Release -o /app/publish
+RUN dotnet publish FieldOps.sln -c Release
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
