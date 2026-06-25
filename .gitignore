@@ -1,0 +1,44 @@
+# Build outputs
+**/bin/
+**/obj/
+**/out/
+
+# Logs
+**/Logs/
+*.log
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Node
+node_modules/
+admin-ui/dist/
+admin-ui/.vite/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets (exclude local config files that may contain keys)
+**/appsettings.*.json
+!**/appsettings.json
+
+# Docker volumes
+fieldops_pgdata/
+
+# .NET publish
+**/publish/
+*.dll
+*.exe
+!src/FieldOps.Api/Program.cs
+
+# Rider / .NET rider cache
+*.sln.docstates
+
+# Test results
+TestResults/
+*.trx

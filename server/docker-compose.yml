@@ -1,0 +1,48 @@
+version: "3.9"
+
+# Development stack: PostgreSQL + API
+# Kullanım: docker compose up -d
+# API'ye bağlanmak için: http://localhost:5080
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fieldops-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fieldops
+      POSTGRES_USER: fieldops
+      POSTGRES_PASSWORD: fieldops_dev_pwd
+      # Dev: TCP üzerinden scram-sha-256 (Npgsql uyumlu). Production'da TLS + sertifika şart.
+      POSTGRES_INITDB_ARGS: "--auth-host=md5"
+    ports:
+      - "5432:5432"
+    volumes:
+      - fieldops_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fieldops -d fieldops"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: src/FieldOps.Api/Dockerfile
+    container_name: fieldops-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=fieldops;Username=fieldops;Password=fieldops_dev_pwd"
+    ports:
+      - "5080:8080"
+    volumes:
+      - fieldops_api_logs:/app/Logs
+
+volumes:
+  fieldops_pgdata:
+  fieldops_api_logs:
