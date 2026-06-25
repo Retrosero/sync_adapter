@@ -1,6 +1,4 @@
-# Build arguments for database configuration
-# Coolify'da ayri ayri Build Argument olarak gonder:
-#   POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD
+# Build arguments
 ARG POSTGRES_HOST=localhost
 ARG POSTGRES_PORT=5432
 ARG POSTGRES_DB=fieldops
@@ -8,19 +6,22 @@ ARG POSTGRES_USER=fieldops
 ARG POSTGRES_PASSWORD=
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /app/build
+WORKDIR /src
 
-# Build context = server/ — . csproj dosyalari server/ altinda
+# Tum solution'i restore et (butun projeler dahil)
+COPY FieldOps.sln .
 COPY src/FieldOps.Contracts/FieldOps.Contracts.csproj src/FieldOps.Contracts/
 COPY src/FieldOps.Domain/FieldOps.Domain.csproj src/FieldOps.Domain/
 COPY src/FieldOps.Application/FieldOps.Application.csproj src/FieldOps.Application/
 COPY src/FieldOps.Infrastructure/FieldOps.Infrastructure.csproj src/FieldOps.Infrastructure/
 COPY src/FieldOps.Api/FieldOps.Api.csproj src/FieldOps.Api/
-RUN dotnet restore src/FieldOps.Api/FieldOps.Api.csproj
+RUN dotnet restore FieldOps.sln
 
+# Tum kaynak kodu kopyala
 COPY src/ .
-COPY FieldOps.sln .
-RUN dotnet publish FieldOps.sln -c Release
+
+# Sadece API projesini publish et (entry point = API projesi)
+RUN dotnet publish src/FieldOps.Api/FieldOps.Api.csproj -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
