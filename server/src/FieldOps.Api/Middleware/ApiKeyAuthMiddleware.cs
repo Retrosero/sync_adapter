@@ -20,10 +20,14 @@ public class ApiKeyAuthMiddleware
     {
         // Anonim endpoint'ler
         var path = ctx.Request.Path.Value ?? string.Empty;
+        var method = ctx.Request.Method;
         if (path.StartsWith("/health", StringComparison.OrdinalIgnoreCase) ||
             path.StartsWith("/swagger", StringComparison.OrdinalIgnoreCase) ||
             path == "/")
         {
+            // HEAD request'leri GET olarak yeniden yaz (wget healthcheck icin)
+            if (method.Equals("HEAD", StringComparison.OrdinalIgnoreCase))
+                ctx.Request.Method = "GET";
             await _next(ctx);
             return;
         }
