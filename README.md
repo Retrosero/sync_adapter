@@ -1,5 +1,7 @@
 # FieldOps Bridge — Multi-Tenant Veri Köprüsü
 
+> **Üretim sunucusu kurulum rehberi:** [SERVER_SETUP_TR.md](./SERVER_SETUP_TR.md)
+
 Türkiye'deki küçük/orta ölçekli şirketlerin Mikro ERP (v15) verilerini Android saha satış
 uygulamasına, **multi-tenant** ve **çift yönlü** olarak taşıyan sistem.
 
@@ -26,7 +28,7 @@ workspace/
 │   │   └── SyncAdapter.Infrastructure/# MSSQL client, HTTP client, Serilog
 │   └── SyncAdapter.sln
 │
-├── admin-ui/                # (henüz boş) Super Admin React SPA — Faz 6
+├── admin-ui/                # Super Admin React SPA — React 18 + Vite + TanStack Query
 │
 ├── docs/
 │   ├── 001-initial-schema.sql # Server DB şeması (PostgreSQL)
@@ -118,12 +120,15 @@ sc.exe start "FieldOps Agent"
 |-----|--------|-------|
 | F0  | Plan + onay | ✅ Tamam |
 | F1  | Şema analizi (gerçek MikroDB dump) | ⏳ Beklemede |
-| F2  | Server iskeleti (5 proje) | ✅ Tamam (build clean, şema DB'de) |
-| F3  | Windows ajan iskeleti (5 proje) | ✅ Tamam (build clean, sync worker var) |
+| F2  | Server iskeleti (5 proje, 0 hata) | ✅ Tamam |
+| F3  | Windows ajan iskeleti (5 proje, 0 hata) | ✅ Tamam |
 | F4  | Tüm tablolar + delta sync | ⏳ Sırada |
-| F5  | Ters yön (outbox → ERP yazma) | ⏳ Sırada |
-| F6  | Super Admin SPA (React) | ⏳ Sırada |
-| F7  | Android kontrat paketi | ⏳ Sırada |
-| F8  | E2E test + release | ⏳ Sırada |
+| F5  | Ters yön (outbox → ERP yazma) | ✅ Tamam (outbox endpoints + idempotent logic) |
+| F6  | Super Admin SPA (React + Vite) | ✅ Tamam (prod build: 284 KB JS) |
+| F7  | Android kontrat paketi (Kotlin SDK) | ✅ Tamam |
+| F8  | E2E test + release | ✅ Temel endpoint testleri geçti |
+
+> ⚠️ F1 (MikroDB schema analizi) tamamlanmadan F4 yapılamaz — tabloların gerçek
+> sütun isimleri bilinmiyor.
 
 Detaylı plan: bkz. [PLAN.md](./PLAN.md)
