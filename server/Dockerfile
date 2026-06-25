@@ -7,10 +7,10 @@ ARG POSTGRES_DB=fieldops
 ARG POSTGRES_USER=fieldops
 ARG POSTGRES_PASSWORD=
 
-# Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
+WORKDIR /app/build
 
+# Build context = server/ — . csproj dosyalari server/ altinda
 COPY src/FieldOps.Contracts/FieldOps.Contracts.csproj src/FieldOps.Contracts/
 COPY src/FieldOps.Domain/FieldOps.Domain.csproj src/FieldOps.Domain/
 COPY src/FieldOps.Application/FieldOps.Application.csproj src/FieldOps.Application/
@@ -21,12 +21,10 @@ RUN dotnet restore src/FieldOps.Api/FieldOps.Api.csproj
 COPY src/ .
 RUN dotnet publish src/FieldOps.Api/FieldOps.Api.csproj -c Release -o /app/publish /p:UseAppHost=false
 
-# Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/publish .
 
-# Build argumenleri runtime ENV'ye aktar
 ARG POSTGRES_HOST
 ARG POSTGRES_PORT
 ARG POSTGRES_DB
@@ -39,7 +37,6 @@ ENV POSTGRES_DB=${POSTGRES_DB}
 ENV POSTGRES_USER=${POSTGRES_USER}
 ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
-# Connection string'i parcalardan runtime'da derle (Coolify = sorunu cozumu)
 ENV ConnectionStrings__Postgres="Host=${POSTGRES_HOST};Port=${POSTGRES_PORT};Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};SSL Mode=Prefer"
 ENV ASPNETCORE_URLS=http://+:8080
 ENV ASPNETCORE_ENVIRONMENT=Production
