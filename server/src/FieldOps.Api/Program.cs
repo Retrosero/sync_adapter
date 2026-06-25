@@ -73,6 +73,3 @@ app.MapEventEndpoints();         // /api/v1/agent/events — Windows ajanı
 app.MapDataEndpoints();          // /api/v1/data/* — Android veri çekme
 
 app.Run();
-
-// Program'ın test edilebilir olması için partial class
-public partial class Program { }
