@@ -1,7 +1,12 @@
 import { getAdminKey } from './auth'
 import type { ApiError } from '../types'
 
-const BASE = '/api/v1'
+// Production'da aynı domain altında sunulursa /api/v1 yeterli.
+// Farklı subdomain kullanılacaksa VITE_API_URL ortam değişkeni ile override edilir.
+// Örnek: VITE_API_URL=https://api.alanadin.com → API: https://api.alanadin.com/api/v1
+// Örnek: VITE_API_URL yok → /api/v1 (aynı origin, Nginx proxy gerektirir)
+const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? '/api/v1'
+const BASE = `${API_BASE}/v1`.replace('/v1/v1', '/v1') // double-slash koruma
 
 async function request<T>(
   method: string,
