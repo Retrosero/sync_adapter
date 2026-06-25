@@ -22,6 +22,9 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/publish .
 
+# wget kur (healthcheck icin gerekli)
+RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
+
 # Build arg'leri runtime ENV'ye aktar
 ARG POSTGRES_HOST=localhost
 ARG POSTGRES_PORT=5432
@@ -42,6 +45,6 @@ EXPOSE 8080
 RUN mkdir -p /app/Logs
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
-    CMD wget -qO- http://localhost:8080/health || exit 1
+    CMD wget -q --spider http://localhost:8080/health || exit 1
 
 ENTRYPOINT ["dotnet", "FieldOps.Api.dll"]
